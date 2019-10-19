@@ -1,6 +1,7 @@
 import datetime
 import os
 import xml.etree.cElementTree as ET
+import sys
 
 # see if this filename is in the array of filenames
 def checkPresent(arr, fileName, curResult):
@@ -46,16 +47,26 @@ def findZipFile():
 # update the children element
 def updateChildren(contentFile, newFile):
     tree = ET.parse(contentFile)
+
+    # check root
     root = tree.getroot() 
     root_tag = root.tag
-    print(root_tag) 
+    if root_tag != "repository":
+        print("# Invalid root tag in " + contentFile + " Quitting")
+        sys.exit
 
-    for form in root.findall("./bar/type"):
-        x=(form.attrib)
-        z=list(x)
-        for i in z:
-            print(x[i])
+    children = root.find("./children")
 
+    # increment counter
+    curSize = children.attrib["size"]
+    children.attrib["size"] = int(curSize) + 1
+
+    # insert new child element
+    newChild = ET.Element("child")
+    newChild.attrib["location"] = "updates/" + newFile
+    children.append(newChild)
+
+    root.write(contentFile)
 
 # check things are ok
 allOk = checkFolder()
@@ -64,14 +75,14 @@ if allOk:
     
     print( "Valid folder, doing update")
 
-    # look for zip file
+    # retrieve zip file, we've already established that it's present
     zipFile = (findZipFile())
 
-    if zipFile is not None:
-        dtg = getDTG()
-        newName = dtg + ".zip"
+    dtg = getDTG()
+    newName = dtg + ".zip"
 
-        # rename file
-        os.rename(zipFile,  newName)  
+    # rename file
+    os.rename(zipFile,  newName)  
 
-        # parse category files
+    # parse category files
+    updateChildren("compositeContent.xml", zipFile)
