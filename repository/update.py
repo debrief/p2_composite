@@ -100,15 +100,26 @@ if allOk:
     dtg = getDTG()
     newName = dtg + ".zip"
 
+    print("Renaming zip file with DTG")
+
     # rename file
     os.rename(zipFile,  newName)  
+
+    print("Updating XML metadata")
 
     # parse category files
     updateChildren("compositeContent.xml", dtg)
     updateChildren("compositeArtifacts.xml", dtg)
 
+    print("Unpacking repository")
+
     # unpack the zip into the updates folder
-  #  unpackZip(newName, dtg, "updates")
+    unpackZip(newName, dtg, "updates")
+
+    print("Deleting .zip file")
 
     # lastly, delete the zip file
-  #  os.remove(newName)
+    os.remove(newName)
+
+    print("== COMPLETE ==")
+
