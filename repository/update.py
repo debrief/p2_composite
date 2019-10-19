@@ -59,14 +59,31 @@ def updateChildren(contentFile, newFile):
 
     # increment counter
     curSize = children.attrib["size"]
-    children.attrib["size"] = int(curSize) + 1
+    children.attrib["size"] = str(int(curSize) + 1)
 
     # insert new child element
     newChild = ET.Element("child")
     newChild.attrib["location"] = "updates/" + newFile
     children.append(newChild)
 
-    root.write(contentFile)
+    # write to file
+    tree.write(contentFile)
+
+    # prepend processing instructions
+    with open(contentFile, 'r') as file:
+        str1 = "<?xml version='1.0' encoding='UTF-8'?>\n"
+        str2 = "<?compositeMetadataRepository version='1.0.0'?>\n"
+        data = file.read()
+        data = str2 + data
+        data = str1 + data
+
+    with open(contentFile, 'w') as file:
+        file.write(data)
+
+
+
+
+
 
 # check things are ok
 allOk = checkFolder()
