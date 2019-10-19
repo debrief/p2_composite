@@ -2,6 +2,7 @@ import datetime
 import os
 import xml.etree.cElementTree as ET
 import sys
+from zipfile import ZipFile
 
 # see if this filename is in the array of filenames
 def checkPresent(arr, fileName, curResult):
@@ -80,10 +81,11 @@ def updateChildren(contentFile, newFile):
     with open(contentFile, 'w') as file:
         file.write(data)
 
-
-
-
-
+def unpackZip(filename, dtg, folder):
+    # Create a ZipFile Object and load sample.zip in it
+    with ZipFile(filename, 'r') as zipObj:
+        # Extract all the contents of zip file in current directory
+        zipObj.extractall(folder + "/" + dtg)
 
 # check things are ok
 allOk = checkFolder()
@@ -102,4 +104,8 @@ if allOk:
     os.rename(zipFile,  newName)  
 
     # parse category files
-    updateChildren("compositeContent.xml", zipFile)
+    updateChildren("compositeContent.xml", dtg)
+    updateChildren("compositeArtifacts.xml", dtg)
+
+    # unpack the zip into the updates folder
+    unpackZip(newName, dtg, "updates")
