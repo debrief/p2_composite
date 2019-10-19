@@ -63,12 +63,12 @@ def updateChildren(contentFile, newFile):
     children.attrib["size"] = str(int(curSize) + 1)
 
     # insert new child element
-    newChild = ET.Element("child")
-    newChild.attrib["location"] = "updates/" + newFile
-    children.append(newChild)
+    newChild = ET.SubElement(children, "child")
+    newChild.tail = '\n'
+    newChild.set("location", "updates/" + newFile)
 
     # write to file
-    tree.write(contentFile)
+    tree.write(contentFile, short_empty_elements=True)
 
     # prepend processing instructions
     with open(contentFile, 'r') as file:
@@ -108,4 +108,7 @@ if allOk:
     updateChildren("compositeArtifacts.xml", dtg)
 
     # unpack the zip into the updates folder
-    unpackZip(newName, dtg, "updates")
+  #  unpackZip(newName, dtg, "updates")
+
+    # lastly, delete the zip file
+  #  os.remove(newName)
