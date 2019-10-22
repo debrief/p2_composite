@@ -4,7 +4,7 @@ folder='.'
 updates="updates"
 
 function findZipFile {
-    echo $(find $folder -name *.zip |head -1)
+    echo $(find $folder -name '*.zip' |head -1)
 }
 
 function checkPresent {
@@ -35,11 +35,20 @@ function updateChildren {
     file=$1
     dt=$2
     lf=$'\n'
+
     count=$(($(grep '<child[[:space:]+]location' "$file" |wc -l)+1))
-    sed "s/<children[[:space:]+]size=.*[\'\"]/<children size='$count'/" <"$file" \
-        | sed "s/<\/children>/  <child location='$updates\/$dt' \/>\\$lf  <\/children>/" \
-        >"$file.new"
-    mv "$file.new" "$file"    
+
+    from="<children[[:space:]+]size=.*[\'\"]"   # Find string: <children   size=["|']
+    to='<children size='                        # Replace to this
+
+    endtag="<\/children>"                       # Find string
+    child="<child location='$updates\/$dt' \/>" # Replace to this
+
+    cat $file | sed "s/$from/$to'$count'/"          \
+              | sed "s/$endtag/  $child\\$lf  $endtag/" \
+    >"$file.new"
+
+    mv "$file.new" "$file"
 }
 
 function unpackZip {
