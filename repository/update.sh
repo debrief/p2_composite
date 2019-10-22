@@ -36,7 +36,7 @@ function updateChildren {
     dt=$2
 
     count=$(($(grep -Pe '<child\s+location' "$file" |wc -l)+1))
-    sed -r "s/<children\s+size='.*'/<children size='$count'/" <"$file" \
+    sed -r "s/<children\s+size=.*[\'\"]/<children size='$count'/" <"$file" \
         | sed -r "s/<\/children>/  <child location='$updates\/$dt' \/>\n  <\/children>/" \
         >"$file.new"
     mv "$file.new" "$file"    
